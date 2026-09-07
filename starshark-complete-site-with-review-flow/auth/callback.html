@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Confirming your StarShark account…</title>
+
+  <link rel="stylesheet" href="../styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+</head>
+
+<body class="auth-page">
+
+<div class="auth-card">
+
+  <div class="brand">
+    <img src="../assets/logo.png">
+  </div>
+
+  <h1 id="title">
+    Confirming your account…
+  </h1>
+
+  <p id="message">
+    One moment while StarShark finishes signing you in.
+  </p>
+
+</div>
+
+
+<script>
+
+(async () => {
+
+  const title =
+    document.getElementById("title");
+
+  const message =
+    document.getElementById("message");
+
+
+  try {
+
+    const supabase =
+      await StarSharkAuth.getClient();
+
+
+    const params =
+      new URLSearchParams(
+        location.search
+      );
+
+
+    const code =
+      params.get("code");
+
+
+    if (code) {
+
+      const {
+        error
+      } =
+        await supabase.auth
+          .exchangeCodeForSession(
+            code
+          );
+
+
+      if (error) {
+        throw error;
+      }
+
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await supabase.auth
+        .getSession();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    if (data.session) {
+
+      location.replace(
+        "../onboarding/index.html"
+      );
+
+      return;
+
+    }
+
+
+    title.textContent =
+      "Email confirmed";
+
+
+    message.innerHTML =
+      'Your email is confirmed. <a href="login.html">Log in to continue.</a>';
+
+  }
+
+  catch (error) {
+
+    title.textContent =
+      "We couldn't finish signing you in";
+
+
+    message.textContent =
+      error.message ||
+      "Please return to the login page and try again.";
+
+  }
+
+})();
+
+</script>
+
+</body>
+</html>

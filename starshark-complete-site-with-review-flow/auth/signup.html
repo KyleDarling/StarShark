@@ -1,3 +1,279 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>StarShark</title><link rel="stylesheet" href="../styles.css"></head><body class=auth-page><div class=auth-card><div class=brand><img src="../assets/logo.png"></div><h1>Start making waves</h1><p>Create your StarShark account.</p><form onsubmit="event.preventDefault();location.href='../onboarding/index.html'">
-<div class=field><label>Business name</label><input class=input required placeholder='Darling Window Cleaning'></div>
-<div class=field><label>Email</label><input class=input type=email required placeholder="you@business.com"></div><div class=field><label>Password</label><input class=input type=password required placeholder="••••••••"></div><button class=btn type=submit>Create account</button></form><div class=auth-links>Already have an account? <a href='login.html'>Log in</a><br><a href="../index.html">← Back to StarShark</a></div></div><script src="../script.js"></script></body></html>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Create your StarShark account</title>
+
+  <link rel="stylesheet" href="../styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+</head>
+
+<body class="auth-page">
+
+<div class="auth-card">
+
+  <div class="brand">
+    <img src="../assets/logo.png">
+  </div>
+
+  <h1>Start making waves</h1>
+
+  <p>Create your StarShark account.</p>
+
+  <form id="signupForm">
+
+    <div class="field">
+      <label>Business name</label>
+
+      <input
+        id="businessName"
+        class="input"
+        required
+        placeholder="Darling Window Cleaning"
+      >
+    </div>
+
+    <div class="field">
+      <label>Your first name</label>
+
+      <input
+        id="firstName"
+        class="input"
+        required
+        placeholder="John"
+      >
+    </div>
+
+    <div class="field">
+      <label>Email</label>
+
+      <input
+        id="email"
+        class="input"
+        type="email"
+        required
+        placeholder="you@business.com"
+      >
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+
+      <input
+        id="password"
+        class="input"
+        type="password"
+        minlength="8"
+        required
+        placeholder="At least 8 characters"
+      >
+    </div>
+
+    <button
+      id="submitBtn"
+      class="btn"
+      type="submit"
+    >
+      Create account
+    </button>
+
+  </form>
+
+  <div
+    id="status"
+    class="notice"
+    style="display:none;margin-top:14px"
+  ></div>
+
+  <div class="auth-links">
+
+    Already have an account?
+    <a href="login.html">Log in</a>
+
+    <br>
+
+    <a href="../index.html">
+      ← Back to StarShark
+    </a>
+
+  </div>
+
+</div>
+
+<script>
+
+const form =
+  document.getElementById("signupForm");
+
+const statusBox =
+  document.getElementById("status");
+
+const submitBtn =
+  document.getElementById("submitBtn");
+
+
+function showStatus(
+  message,
+  isError = false
+) {
+
+  statusBox.style.display =
+    "block";
+
+  statusBox.textContent =
+    message;
+
+  statusBox.style.borderColor =
+    isError
+      ? "#ff707a"
+      : "#2699c8";
+}
+
+
+form.addEventListener(
+  "submit",
+  async (event) => {
+
+    event.preventDefault();
+
+    submitBtn.disabled =
+      true;
+
+    submitBtn.textContent =
+      "Creating account…";
+
+    statusBox.style.display =
+      "none";
+
+
+    try {
+
+      const supabase =
+        await StarSharkAuth.getClient();
+
+
+      const businessName =
+        document
+          .getElementById(
+            "businessName"
+          )
+          .value
+          .trim();
+
+
+      const firstName =
+        document
+          .getElementById(
+            "firstName"
+          )
+          .value
+          .trim();
+
+
+      const email =
+        document
+          .getElementById(
+            "email"
+          )
+          .value
+          .trim();
+
+
+      const password =
+        document
+          .getElementById(
+            "password"
+          )
+          .value;
+
+
+      const redirectTo =
+        location.origin +
+        "/auth/callback.html";
+
+
+      const {
+        data,
+        error
+      } =
+        await supabase.auth.signUp({
+
+          email,
+
+          password,
+
+          options: {
+
+            emailRedirectTo:
+              redirectTo,
+
+            data: {
+
+              business_name:
+                businessName,
+
+              first_name:
+                firstName
+
+            }
+
+          }
+
+        });
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      if (!data.session) {
+
+        showStatus(
+          "Check your email to confirm your StarShark account. After confirmation, you'll continue onboarding."
+        );
+
+        form.reset();
+
+        return;
+
+      }
+
+
+      location.replace(
+        "../onboarding/index.html"
+      );
+
+    }
+
+    catch (error) {
+
+      showStatus(
+        error.message ||
+        "Could not create your account.",
+        true
+      );
+
+    }
+
+    finally {
+
+      submitBtn.disabled =
+        false;
+
+      submitBtn.textContent =
+        "Create account";
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>

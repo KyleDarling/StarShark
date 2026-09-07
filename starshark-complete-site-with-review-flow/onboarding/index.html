@@ -124,224 +124,114 @@
 
 
 <script>
+let sbClient = null;
+let currentSession = null;
 
-let supabase;
-let currentSession;
+const statusBox = document.getElementById("status");
+const form = document.getElementById("workspaceForm");
+const continueBtn = document.getElementById("continueBtn");
 
+function showError(message) {
+  statusBox.style.display = "block";
+  statusBox.textContent = message;
+}
 
-(async () => {
-
+async function initializeOnboarding() {
   try {
+    sbClient = await StarSharkAuth.getClient();
 
-    supabase =
-      await StarSharkAuth
-        .getClient();
-
-
-    currentSession =
-      await StarSharkAuth
-        .requireSession();
-
+    currentSession = await StarSharkAuth.requireSession();
 
     if (!currentSession) {
       return;
     }
 
-
     const metadata =
-      currentSession.user
-        .user_metadata || {};
+      currentSession.user.user_metadata || {};
 
-
-    if (
-      metadata.business_name
-    ) {
-
-      document
-        .getElementById(
-          "businessName"
-        )
-        .value =
-          metadata.business_name;
-
+    if (metadata.business_name) {
+      document.getElementById("businessName").value =
+        metadata.business_name;
     }
 
-
-    const {
-      data,
-      error
-    } =
-      await supabase
-        .from(
-          "business_members"
-        )
-        .select(
-          "business_id"
-        )
-        .eq(
-          "user_id",
-          currentSession.user.id
-        )
-        .limit(1);
-
+    const { data, error } = await sbClient
+      .from("business_members")
+      .select("business_id")
+      .eq("user_id", currentSession.user.id)
+      .limit(1);
 
     if (error) {
       throw error;
     }
 
-
-    if (
-      data &&
-      data.length
-    ) {
-
-      location.replace(
-        "../app/dashboard.html"
-      );
-
+    if (data && data.length > 0) {
+      window.location.replace("../app/dashboard.html");
     }
-
-  }
-
-  catch (error) {
-
-    const statusBox =
-      document.getElementById(
-        "status"
-      );
-
-
-    statusBox.style.display =
-      "block";
-
-
-    statusBox.textContent =
+  } catch (error) {
+    showError(
       error.message ||
-      "Could not load onboarding.";
+      "Could not load your StarShark workspace."
+    );
+  }
+}
 
+form.addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  if (!sbClient) {
+    showError("StarShark is still connecting. Please try again.");
+    return;
   }
 
-})();
+  continueBtn.disabled = true;
+  continueBtn.textContent = "Creating workspace…";
+  statusBox.style.display = "none";
 
+  try {
+    const { data, error } = await sbClient.rpc(
+      "create_business_for_current_user",
+      {
+        p_name:
+          document
+            .getElementById("businessName")
+            .value.trim(),
 
-document
-  .getElementById(
-    "workspaceForm"
-  )
-  .addEventListener(
-    "submit",
-    async (event) => {
+        p_email:
+          document
+            .getElementById("businessEmail")
+            .value.trim() || null,
 
-      event.preventDefault();
+        p_phone:
+          document
+            .getElementById("businessPhone")
+            .value.trim() || null,
 
-
-      const continueBtn =
-        document.getElementById(
-          "continueBtn"
-        );
-
-
-      const statusBox =
-        document.getElementById(
-          "status"
-        );
-
-
-      continueBtn.disabled =
-        true;
-
-
-      continueBtn.textContent =
-        "Creating workspace…";
-
-
-      statusBox.style.display =
-        "none";
-
-
-      try {
-
-        const {
-          error
-        } =
-          await supabase.rpc(
-            "create_business_for_current_user",
-            {
-
-              p_name:
-                document
-                  .getElementById(
-                    "businessName"
-                  )
-                  .value
-                  .trim(),
-
-              p_email:
-                document
-                  .getElementById(
-                    "businessEmail"
-                  )
-                  .value
-                  .trim() ||
-                null,
-
-              p_phone:
-                document
-                  .getElementById(
-                    "businessPhone"
-                  )
-                  .value
-                  .trim() ||
-                null,
-
-              p_timezone:
-                document
-                  .getElementById(
-                    "timezone"
-                  )
-                  .value
-
-            }
-          );
-
-
-        if (error) {
-          throw error;
-        }
-
-
-        location.replace(
-          "../app/dashboard.html"
-        );
-
+        p_timezone:
+          document
+            .getElementById("timezone")
+            .value
       }
+    );
 
-      catch (error) {
-
-        statusBox.style.display =
-          "block";
-
-
-        statusBox.textContent =
-          error.message ||
-          "Could not create workspace.";
-
-      }
-
-      finally {
-
-        continueBtn.disabled =
-          false;
-
-
-        continueBtn.textContent =
-          "Create workspace →";
-
-      }
-
+    if (error) {
+      throw error;
     }
-  );
 
+    window.location.replace(
+      "../app/dashboard.html"
+    );
+  } catch (error) {
+    showError(
+      error.message ||
+      "Could not create your workspace."
+    );
+  } finally {
+    continueBtn.disabled = false;
+    continueBtn.textContent = "Create workspace →";
+  }
+});
+
+initializeOnboarding();
 </script>
 
 </body>

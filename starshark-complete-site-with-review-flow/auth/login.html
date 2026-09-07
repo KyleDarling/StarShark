@@ -1,3 +1,303 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>StarShark</title><link rel="stylesheet" href="../styles.css"></head><body class=auth-page><div class=auth-card><div class=brand><img src="../assets/logo.png"></div><h1>Welcome back</h1><p>Log in to your dashboard.</p><form onsubmit="event.preventDefault();location.href='../app/dashboard.html'">
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<div class=field><label>Email</label><input class=input type=email required placeholder="you@business.com"></div><div class=field><label>Password</label><input class=input type=password required placeholder="••••••••"></div><button class=btn type=submit>Log in</button></form><div class=auth-links>Need an account? <a href='signup.html'>Sign up</a><br><a href="../index.html">← Back to StarShark</a></div></div><script src="../script.js"></script></body></html>
+  <title>Log in to StarShark</title>
+
+  <link rel="stylesheet" href="../styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+</head>
+
+<body class="auth-page">
+
+<div class="auth-card">
+
+  <div class="brand">
+    <img src="../assets/logo.png">
+  </div>
+
+  <h1>Welcome back</h1>
+
+  <p>
+    Log in to your StarShark dashboard.
+  </p>
+
+  <form id="loginForm">
+
+    <div class="field">
+
+      <label>Email</label>
+
+      <input
+        id="email"
+        class="input"
+        type="email"
+        required
+        placeholder="you@business.com"
+      >
+
+    </div>
+
+    <div class="field">
+
+      <label>Password</label>
+
+      <input
+        id="password"
+        class="input"
+        type="password"
+        required
+        placeholder="••••••••"
+      >
+
+    </div>
+
+    <button
+      id="submitBtn"
+      class="btn"
+      type="submit"
+    >
+      Log in
+    </button>
+
+  </form>
+
+
+  <button
+    id="forgotBtn"
+    class="btn ghost"
+    style="width:100%;margin-top:8px"
+  >
+    Forgot password?
+  </button>
+
+
+  <div
+    id="status"
+    class="notice"
+    style="display:none;margin-top:14px"
+  ></div>
+
+
+  <div class="auth-links">
+
+    Need an account?
+    <a href="signup.html">
+      Sign up
+    </a>
+
+    <br>
+
+    <a href="../index.html">
+      ← Back to StarShark
+    </a>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const statusBox =
+  document.getElementById("status");
+
+
+function showStatus(
+  message,
+  isError = false
+) {
+
+  statusBox.style.display =
+    "block";
+
+  statusBox.textContent =
+    message;
+
+  statusBox.style.borderColor =
+    isError
+      ? "#ff707a"
+      : "#2699c8";
+
+}
+
+
+document
+  .getElementById("loginForm")
+  .addEventListener(
+    "submit",
+    async (event) => {
+
+      event.preventDefault();
+
+      const submitBtn =
+        document.getElementById(
+          "submitBtn"
+        );
+
+
+      submitBtn.disabled =
+        true;
+
+      submitBtn.textContent =
+        "Logging in…";
+
+
+      try {
+
+        const supabase =
+          await StarSharkAuth
+            .getClient();
+
+
+        const email =
+          document
+            .getElementById(
+              "email"
+            )
+            .value
+            .trim();
+
+
+        const password =
+          document
+            .getElementById(
+              "password"
+            )
+            .value;
+
+
+        const {
+          error
+        } =
+          await supabase.auth
+            .signInWithPassword({
+
+              email,
+
+              password
+
+            });
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        const next =
+          new URLSearchParams(
+            location.search
+          )
+          .get("next");
+
+
+        location.replace(
+          next ||
+          "../app/dashboard.html"
+        );
+
+      }
+
+      catch (error) {
+
+        showStatus(
+          error.message ||
+          "Login failed.",
+          true
+        );
+
+      }
+
+      finally {
+
+        submitBtn.disabled =
+          false;
+
+        submitBtn.textContent =
+          "Log in";
+
+      }
+
+    }
+  );
+
+
+document
+  .getElementById("forgotBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
+
+
+      if (!email) {
+
+        showStatus(
+          "Enter your email address first.",
+          true
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        const supabase =
+          await StarSharkAuth
+            .getClient();
+
+
+        const {
+          error
+        } =
+          await supabase.auth
+            .resetPasswordForEmail(
+              email,
+              {
+                redirectTo:
+                  location.origin +
+                  "/auth/reset-password.html"
+              }
+            );
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        showStatus(
+          "Password reset email sent."
+        );
+
+      }
+
+      catch (error) {
+
+        showStatus(
+          error.message ||
+          "Could not send reset email.",
+          true
+        );
+
+      }
+
+    }
+  );
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StarShark Review Link Generator</title><link rel="stylesheet" href="../styles.css"></head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+  <a class="brand" href="dashboard.html"><img src="../assets/logo.png"><div class="tagline">MORE REVIEWS. A BIGGER TOMORROW.</div></a>
+  <nav class="nav">
+    <a href="dashboard.html"><b>🏠</b><span>Dashboard</span></a>
+    <a href="customers.html"><b>👥</b><span>Customers</span></a>
+    <a class="active" href="review-links.html"><b>🔗</b><span>Review Links</span></a>
+    <a href="reviews.html"><b>⭐</b><span>Reviews</span></a>
+    <a href="automations.html"><b>⚙️</b><span>Automations</span></a>
+  </nav>
+</aside>
+<main class="main">
+<div class="topbar"><input class="input search" placeholder="🔎 Search..."><div class="biz"><div class="biz-switch">🏢 Darling Window Cleaning ▾</div></div></div>
+<div class="hero-row"><div><h1>Customer Review Page 🔗</h1><p>Generate the branded page customers see after a job.</p></div></div>
+<div class="grid2">
+  <div class="card">
+    <h2>Review Page Settings</h2>
+    <div class="field"><label>Business name</label><input id="biz" class="input" value="Darling Window Cleaning"></div>
+    <div class="field"><label>Google review link</label><input id="review" class="input" placeholder="https://g.page/r/..."></div>
+    <div class="field"><label>Owner feedback email</label><input id="email" class="input" placeholder="owner@business.com"></div>
+    <button id="generate" class="btn">Generate Preview Link</button>
+  </div>
+  <div class="card">
+    <h2>Customer Experience</h2>
+    <p class="muted">Customers first choose Good, Meh, or Bad. After that, every customer can either leave an honest Google review or send private feedback.</p>
+    <div class="notice">This keeps the workflow useful for customer recovery without selectively sending only positive customers to Google.</div>
+    <p><a id="preview" class="btn secondary" href="../review/index.html?business=Darling%20Window%20Cleaning" target="_blank">Open Customer Page</a></p>
+  </div>
+</div>
+</main></div>
+<script src="../script.js"></script>
+<script>
+document.getElementById('generate').onclick=()=>{
+ const b=encodeURIComponent(document.getElementById('biz').value);
+ const r=encodeURIComponent(document.getElementById('review').value);
+ const e=encodeURIComponent(document.getElementById('email').value);
+ const href='../review/index.html?business='+b+'&review='+r+'&email='+e;
+ const p=document.getElementById('preview'); p.href=href; p.textContent='Open Generated Customer Page';
+ showToast('Review page link generated');
+};
+</script>
+</body></html>

@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How was your service?</title>
+<style>
+:root{
+  --deep:#021d40;--ocean:#075a8c;--cyan:#51dfff;--blue:#118fff;
+  --white:#f7fdff;--muted:#a8d5ea;--card:#07355f;--line:#1886bb;
+  --good:#42df89;--meh:#ffc84a;--bad:#ff707a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--white)}
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(76,216,255,.38),transparent 34%),
+    linear-gradient(180deg,#0b76a8 0%,#064a7c 27%,#032d5b 61%,#021b3e 100%);
+}
+.ocean-light{
+  position:fixed;inset:0;pointer-events:none;opacity:.28;
+  background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.22) 41%,transparent 53%);
+  animation:sway 8s ease-in-out infinite alternate;
+}
+@keyframes sway{to{transform:translateX(6vw)}}
+.bubble{
+  position:fixed;border:1px solid rgba(155,236,255,.75);border-radius:50%;
+  background:rgba(180,242,255,.07);pointer-events:none;animation:rise var(--d) linear infinite
+}
+@keyframes rise{
+  from{transform:translateY(110vh) scale(.7);opacity:0}
+  12%{opacity:.6}
+  to{transform:translateY(-15vh) scale(1.15);opacity:0}
+}
+.page{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 18px 60px}
+.wrap{width:min(650px,100%)}
+.logo{text-align:center;margin-bottom:12px}
+.logo img{width:180px;max-width:52vw;filter:drop-shadow(0 12px 26px rgba(0,0,0,.26))}
+.shark{font-size:78px;line-height:1;text-align:center;animation:bob 3.2s ease-in-out infinite alternate;filter:drop-shadow(0 12px 12px rgba(0,0,0,.2))}
+@keyframes bob{to{transform:translateY(-7px) rotate(1deg)}}
+.card{
+  background:linear-gradient(180deg,rgba(7,58,102,.96),rgba(4,37,74,.98));
+  border:1px solid rgba(68,203,255,.62);border-radius:24px;padding:28px;
+  box-shadow:0 28px 80px rgba(0,15,40,.38),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.company{text-align:center;color:#85e5ff;font-weight:800;font-size:14px;margin-bottom:6px}
+h1{text-align:center;font-size:31px;line-height:1.12;margin:4px 0 8px}
+.sub{text-align:center;color:#bfe3f1;margin:0 auto 22px;line-height:1.5}
+.sentiments{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.choice{
+  appearance:none;border:1px solid #187fae;background:#062d55;color:#fff;border-radius:18px;
+  padding:17px 8px 15px;cursor:pointer;transition:.18s;min-height:118px
+}
+.choice:hover{transform:translateY(-3px);border-color:#61ddff;box-shadow:0 12px 28px rgba(0,0,0,.2)}
+.choice .face{display:block;font-size:43px;margin-bottom:7px}
+.choice b{font-size:16px}
+.choice.good:hover{box-shadow:0 0 0 2px rgba(66,223,137,.18),0 12px 28px rgba(0,0,0,.2)}
+.choice.meh:hover{box-shadow:0 0 0 2px rgba(255,200,74,.18),0 12px 28px rgba(0,0,0,.2)}
+.choice.bad:hover{box-shadow:0 0 0 2px rgba(255,112,122,.18),0 12px 28px rgba(0,0,0,.2)}
+.screen{display:none}.screen.active{display:block}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:18px}
+.action{
+  border-radius:13px;padding:14px 15px;text-align:center;font-weight:850;cursor:pointer;text-decoration:none;
+  border:1px solid #35bafa
+}
+.action.google{background:linear-gradient(180deg,#25adff,#087bf0);color:white}
+.action.feedback{background:#07335a;color:#eafbff}
+textarea,input{
+  width:100%;border:1px solid #1479aa;background:#052a51;color:#fff;border-radius:12px;
+  padding:13px;font:inherit;outline:none
+}
+textarea{min-height:122px;resize:vertical;margin-top:12px}
+textarea:focus,input:focus{border-color:#5de5ff;box-shadow:0 0 0 3px rgba(93,229,255,.1)}
+.small{font-size:12px;color:#9bc8dc;text-align:center;line-height:1.45}
+.back{border:0;background:transparent;color:#91dcf7;cursor:pointer;font-weight:750;margin-top:16px;width:100%;padding:8px}
+.feedback-panel{margin-top:18px;padding:17px;border:1px solid #156d99;background:#052a50;border-radius:15px;display:none}
+.feedback-panel.open{display:block}
+.feedback-panel h3{margin:0 0 5px}
+.feedback-panel p{margin:0;color:#acd4e5;font-size:13px}
+.submit{
+  width:100%;margin-top:10px;border:1px solid #3cc6ff;background:linear-gradient(180deg,#1da6f8,#0875dc);
+  color:white;font-weight:900;padding:13px;border-radius:11px;cursor:pointer
+}
+.success{
+  text-align:center;padding:14px;margin-top:14px;border:1px solid #2ea778;background:rgba(32,129,88,.28);
+  border-radius:12px;display:none
+}
+.success.show{display:block}
+.privacy{text-align:center;margin-top:14px;color:#9ccadd;font-size:11px}
+.wave{
+  position:fixed;bottom:-1px;left:0;width:100%;height:75px;pointer-events:none;
+  background:radial-gradient(ellipse at 20% 100%,#0d718c 0 18%,transparent 19%),
+             radial-gradient(ellipse at 58% 100%,#09657e 0 25%,transparent 26%),
+             linear-gradient(180deg,transparent,#054668);
+  opacity:.7
+}
+@media(max-width:560px){
+  .page{align-items:flex-start;padding-top:20px}
+  .card{padding:22px 17px;border-radius:20px}
+  h1{font-size:27px}
+  .sentiments{gap:7px}
+  .choice{min-height:105px;padding:14px 4px}
+  .choice .face{font-size:37px}
+  .actions{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="ocean-light"></div>
+<div class="wave"></div>
+<main class="page">
+  <div class="wrap">
+    <div class="logo"><img src="../assets/logo.png" alt="StarShark"></div>
+    <div class="shark">🦈</div>
+
+    <section class="card">
+      <div id="screen1" class="screen active">
+        <div class="company" id="companyTop">Darling Window Cleaning</div>
+        <h1>How was your service?</h1>
+        <p class="sub">We'd love to hear how everything went today.</p>
+
+        <div class="sentiments">
+          <button class="choice good" data-feeling="good">
+            <span class="face">😍</span><b>Good</b>
+          </button>
+          <button class="choice meh" data-feeling="meh">
+            <span class="face">😐</span><b>Meh</b>
+          </button>
+          <button class="choice bad" data-feeling="bad">
+            <span class="face">😞</span><b>Bad</b>
+          </button>
+        </div>
+        <p class="privacy">Your feedback helps <span id="companyPrivacy">the business</span> improve.</p>
+      </div>
+
+      <div id="screen2" class="screen">
+        <div class="company" id="companyResult">Darling Window Cleaning</div>
+        <h1 id="resultTitle">Thanks for letting us know.</h1>
+        <p class="sub" id="resultCopy">Your experience matters.</p>
+
+        <!-- Google review remains available for every sentiment to avoid review gating. -->
+        <div class="actions">
+          <a id="googleBtn" class="action google" href="#" target="_blank" rel="noopener">
+            ⭐ Leave a Google Review
+          </a>
+          <button id="feedbackBtn" class="action feedback">
+            💬 Send Private Feedback
+          </button>
+        </div>
+
+        <div id="feedbackPanel" class="feedback-panel">
+          <h3>Tell the owner what happened</h3>
+          <p>This feedback goes privately to the business and isn't posted publicly.</p>
+          <textarea id="feedbackText" placeholder="Anything you'd like the owner to know?"></textarea>
+          <button id="submitFeedback" class="submit">Send Feedback</button>
+          <div id="success" class="success">✓ Thank you. Your feedback was sent to the business.</div>
+        </div>
+
+        <button class="back" id="backBtn">← Change my answer</button>
+        <p class="small">You can share an honest public review or send private feedback. StarShark does not filter customers based on whether their experience was positive or negative.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const qs = new URLSearchParams(location.search);
+const company = qs.get('business') || qs.get('company') || 'Darling Window Cleaning';
+const googleReview = qs.get('review') || '#';
+const ownerEmail = qs.get('email') || '';
+const customerId = qs.get('customer') || '';
+const jobId = qs.get('job') || '';
+
+document.getElementById('companyTop').textContent = company;
+document.getElementById('companyResult').textContent = company;
+document.getElementById('companyPrivacy').textContent = company;
+document.title = 'How was your service with ' + company + '?';
+document.getElementById('googleBtn').href = googleReview;
+
+let feeling = null;
+const copy = {
+  good: {
+    title: "That's great to hear! 🌟",
+    text: "Thanks for choosing " + company + ". You can share your experience publicly or send a private note."
+  },
+  meh: {
+    title: "Thanks for being honest.",
+    text: "We appreciate the feedback. You can share an honest Google review or tell the owner privately what could have been better."
+  },
+  bad: {
+    title: "We're sorry it didn't go well.",
+    text: "The owner would like to understand what happened. You can send private feedback, and the Google review option remains available if you'd like to share your experience publicly."
+  }
+};
+
+document.querySelectorAll('.choice').forEach(btn => {
+  btn.addEventListener('click', () => {
+    feeling = btn.dataset.feeling;
+    document.getElementById('resultTitle').textContent = copy[feeling].title;
+    document.getElementById('resultCopy').textContent = copy[feeling].text;
+    document.getElementById('screen1').classList.remove('active');
+    document.getElementById('screen2').classList.add('active');
+
+    // Make private feedback visible immediately for meh/bad; Google remains equally accessible.
+    document.getElementById('feedbackPanel').classList.toggle('open', feeling !== 'good');
+  });
+});
+
+document.getElementById('feedbackBtn').addEventListener('click', () => {
+  document.getElementById('feedbackPanel').classList.toggle('open');
+  setTimeout(()=>document.getElementById('feedbackText').focus(), 50);
+});
+
+document.getElementById('backBtn').addEventListener('click', () => {
+  document.getElementById('screen2').classList.remove('active');
+  document.getElementById('screen1').classList.add('active');
+  document.getElementById('feedbackPanel').classList.remove('open');
+  document.getElementById('success').classList.remove('show');
+});
+
+document.getElementById('submitFeedback').addEventListener('click', () => {
+  const feedback = document.getElementById('feedbackText').value.trim();
+  if(!feedback){ document.getElementById('feedbackText').focus(); return; }
+
+  // Prototype behavior: store locally and optionally open owner's email.
+  const payload = {
+    company, feeling, feedback, customerId, jobId,
+    createdAt: new Date().toISOString()
+  };
+  const history = JSON.parse(localStorage.getItem('starshark_private_feedback') || '[]');
+  history.push(payload);
+  localStorage.setItem('starshark_private_feedback', JSON.stringify(history));
+
+  document.getElementById('success').classList.add('show');
+
+  if(ownerEmail){
+    const subject = encodeURIComponent('Private StarShark feedback - ' + company);
+    const body = encodeURIComponent(
+      'Customer sentiment: ' + feeling + '\n\n' +
+      feedback + '\n\n' +
+      (customerId ? 'Customer ID: ' + customerId + '\n' : '') +
+      (jobId ? 'Job ID: ' + jobId + '\n' : '')
+    );
+    setTimeout(()=>{ window.location.href = 'mailto:' + ownerEmail + '?subject=' + subject + '&body=' + body; }, 350);
+  }
+});
+
+for(let i=0;i<20;i++){
+  const b=document.createElement('i');
+  b.className='bubble';
+  const s=5+Math.random()*13;
+  b.style.width=b.style.height=s+'px';
+  b.style.left=(Math.random()*100)+'%';
+  b.style.setProperty('--d',(9+Math.random()*13)+'s');
+  b.style.animationDelay=(-Math.random()*15)+'s';
+  document.body.appendChild(b);
+}
+</script>
+</body>
+</html>

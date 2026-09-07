@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StarShark</title>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;background:#eefaff}
+.stage{position:relative;width:min(100%,1024px);aspect-ratio:1024/1536;margin:auto;background:url("assets/marketing.png") center/100% 100% no-repeat}
+.hot{position:absolute;background:transparent;border:0;cursor:pointer;border-radius:9px;z-index:4}
+.hot:hover,.hot:focus-visible{background:rgba(0,140,255,.07);box-shadow:0 0 0 2px rgba(0,130,255,.18) inset;outline:none}
+.resources-menu{position:absolute;z-index:20;top:4.1%;left:56.8%;width:170px;background:white;border:1px solid #c8deed;border-radius:12px;padding:7px;box-shadow:0 12px 30px rgba(2,34,67,.18);display:none}
+.resources-menu.open{display:block}
+.resources-menu a{display:block;padding:9px 10px;color:#06254b;text-decoration:none;border-radius:8px;font:600 13px Arial,sans-serif}
+.resources-menu a:hover{background:#e8f6ff}
+.demo-modal{position:fixed;inset:0;background:rgba(1,18,38,.72);z-index:100;display:none;place-items:center;padding:20px}
+.demo-modal.open{display:grid}
+.demo-box{width:min(620px,100%);background:#062d56;color:white;border:1px solid #36bcf4;border-radius:18px;padding:25px;box-shadow:0 25px 80px rgba(0,0,0,.4);font-family:Arial,sans-serif}
+.demo-box h2{margin-top:0}.demo-close{float:right;border:0;background:#0b5485;color:white;border-radius:8px;padding:7px 10px;cursor:pointer}
+@media(max-width:700px){.stage{min-width:720px}}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- Header -->
+  <a class="hot" aria-label="StarShark home" href="index.html" style="left:6.4%;top:.5%;width:27%;height:5.5%"></a>
+  <button class="hot" aria-label="Features" data-scroll=".355" style="left:36.9%;top:1.7%;width:6%;height:2.8%"></button>
+  <button class="hot" aria-label="Integrations" data-scroll=".645" style="left:43.6%;top:1.7%;width:7.1%;height:2.8%"></button>
+  <a class="hot" aria-label="Pricing" href="pricing.html" style="left:51.1%;top:1.7%;width:5.2%;height:2.8%"></a>
+  <button class="hot" id="resourcesBtn" aria-label="Resources" style="left:56.3%;top:1.6%;width:7.2%;height:3%"></button>
+  <a class="hot" aria-label="Log in" href="auth/login.html" style="left:77.6%;top:1.4%;width:6.5%;height:3.2%"></a>
+  <a class="hot" aria-label="Start free trial" href="auth/signup.html" style="left:83.1%;top:.9%;width:12.2%;height:4.1%"></a>
+
+  <!-- Hero -->
+  <a class="hot" aria-label="Start free trial" href="auth/signup.html" style="left:4.4%;top:19.4%;width:18.5%;height:3.8%"></a>
+  <button class="hot demoBtn" aria-label="Watch demo" style="left:25.4%;top:19.1%;width:14.3%;height:4.2%"></button>
+
+  <!-- How it works -->
+  <button class="hot" aria-label="See how it works" data-scroll=".50" style="left:4.4%;top:60.9%;width:16.5%;height:3.2%"></button>
+
+  <!-- Integration cards -->
+  <a class="hot" aria-label="Housecall Pro integration" href="app/integrations.html" style="left:4.5%;top:69.1%;width:14.4%;height:3.3%"></a>
+  <a class="hot" aria-label="Jobber integration" href="app/integrations.html" style="left:19.5%;top:69.1%;width:12.8%;height:3.3%"></a>
+  <a class="hot" aria-label="ServiceTitan integration" href="app/integrations.html" style="left:33.2%;top:69.1%;width:15.5%;height:3.3%"></a>
+  <a class="hot" aria-label="JobProgress integration" href="app/integrations.html" style="left:49%;top:69.1%;width:13.5%;height:3.3%"></a>
+  <a class="hot" aria-label="Zapier integration" href="app/integrations.html" style="left:63%;top:69.1%;width:11.4%;height:3.3%"></a>
+
+  <!-- Bottom CTA -->
+  <a class="hot" aria-label="Start free trial" href="auth/signup.html" style="left:26.7%;top:79%;width:14%;height:3.4%"></a>
+  <button class="hot demoBtn" aria-label="Watch demo" style="left:42%;top:78.7%;width:12%;height:4%"></button>
+
+  <!-- Footer -->
+  <button class="hot" aria-label="Features" data-scroll=".355" style="left:20.5%;top:96.4%;width:6.5%;height:2.1%"></button>
+  <button class="hot" aria-label="Integrations" data-scroll=".645" style="left:27.3%;top:96.4%;width:8%;height:2.1%"></button>
+  <a class="hot" aria-label="Pricing" href="pricing.html" style="left:35.8%;top:96.4%;width:5%;height:2.1%"></a>
+  <a class="hot" aria-label="Blog" href="resources/guides.html" style="left:41.8%;top:96.4%;width:4.6%;height:2.1%"></a>
+  <a class="hot" aria-label="Contact" href="resources/contact.html" style="left:47.1%;top:96.4%;width:5.8%;height:2.1%"></a>
+
+  <div class="resources-menu" id="resourcesMenu">
+    <a href="resources/help.html">Help Center</a>
+    <a href="resources/guides.html">Guides & Resources</a>
+    <a href="app/integrations.html">Integrations</a>
+    <a href="resources/contact.html">Contact</a>
+  </div>
+</div>
+
+<div class="demo-modal" id="demoModal">
+  <div class="demo-box">
+    <button class="demo-close" id="demoClose">Close</button>
+    <h2>🦈 How StarShark Works</h2>
+    <p><b>1.</b> Connect your CRM or import your customers.</p>
+    <p><b>2.</b> A completed job automatically triggers a personalized review request.</p>
+    <p><b>3.</b> StarShark tracks sends, clicks, reviews, and follow-ups.</p>
+    <p><b>4.</b> Shark Patrol can identify eligible past customers near today's route and help fill open time.</p>
+    <p><a href="auth/signup.html" style="color:#59dfff;font-weight:bold">Start your free trial →</a></p>
+  </div>
+</div>
+
+<script>
+const stage=document.getElementById('stage');
+document.querySelectorAll('[data-scroll]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const pct=parseFloat(el.dataset.scroll);
+    const y=stage.getBoundingClientRect().top + window.scrollY + stage.offsetHeight*pct;
+    window.scrollTo({top:y,behavior:'smooth'});
+  });
+});
+
+const rb=document.getElementById('resourcesBtn');
+const rm=document.getElementById('resourcesMenu');
+rb.addEventListener('click',e=>{e.stopPropagation();rm.classList.toggle('open')});
+document.addEventListener('click',e=>{if(!rm.contains(e.target)&&e.target!==rb)rm.classList.remove('open')});
+
+const modal=document.getElementById('demoModal');
+document.querySelectorAll('.demoBtn').forEach(x=>x.addEventListener('click',()=>modal.classList.add('open')));
+document.getElementById('demoClose').addEventListener('click',()=>modal.classList.remove('open'));
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.classList.remove('open')});
+</script>
+</body>
+</html>
